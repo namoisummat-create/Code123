@@ -1,0 +1,260 @@
+-- Coolgui Ultimate Customizable Script for Delta Executor
+-- ธีมดำแดง Full Customizable 🔴⚫
+
+-- ===== LOAD LIBRARY (ปรับแต่ง UI ได้) =====
+local Library = loadstring(game:HttpGet("https://pastebin.com/raw/vJh7QnH8"))()
+local Window = Library:CreateWindow("Coolgui Hub v3.0", "rbxassetid://6031090990")
+
+-- ===== CONFIG SYSTEM =====
+getgenv().CoolguiConfig = {
+    Speed = 16,
+    FlightSpeed = 50,
+    JumpPower = 50,
+    Gravity = 196.2,
+    TargetPlayer = nil
+}
+
+-- ===== MAIN TAB =====
+local MainTab = Window:CreateTab("⚡ เมนูหลัก")
+local Section1 = MainTab:CreateSection("⚙️ ปรับความสามารถตัวเอง")
+
+-- Speed Slider (ปรับความเร็วได้)
+Section1:CreateSlider("ความเร็วเดิน", 0, 500, 16, function(value)
+    getgenv().CoolguiConfig.Speed = value
+    local char = game.Players.LocalPlayer.Character
+    if char then
+        char.Humanoid.WalkSpeed = value
+    end
+end)
+
+-- Flight Speed Slider (ปรับความเร็วบิน)
+Section1:CreateSlider("ความเร็วบิน", 0, 500, 50, function(value)
+    getgenv().CoolguiConfig.FlightSpeed = value
+end)
+
+-- Jump Power Slider (ปรับแรงกระโดด)
+Section1:CreateSlider("พลังกระโดด", 0, 1000, 50, function(value)
+    getgenv().CoolguiConfig.JumpPower = value
+    local char = game.Players.LocalPlayer.Character
+    if char then
+        char.Humanoid.JumpPower = value
+    end
+end)
+
+-- Gravity Slider (ปรับแรงโน้มถ่วง)
+Section1:CreateSlider("แรงโน้มถ่วง", 0, 500, 196.2, function(value)
+    getgenv().CoolguiConfig.Gravity = value
+    game.Workspace.Gravity = value
+end)
+
+-- Flight Toggle (เปิด/ปิดบิน)
+Section1:CreateToggle("โหมดบิน", function(v)
+    local char = game.Players.LocalPlayer.Character
+    if char then
+        local humanoid = char:FindFirstChildOfClass("Humanoid")
+        if v then
+            humanoid:ChangeState(Enum.HumanoidStateType.Flying)
+        else
+            humanoid:ChangeState(Enum.HumanoidStateType.Landed)
+        end
+    end
+end)
+
+-- Noclip Toggle
+Section1:CreateToggle("เดินทะลุกำแพง", function(v)
+    getgenv().Noclip = v
+    while getgenv().Noclip do
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CanCollide = false
+        wait(0.1)
+    end
+end)
+
+-- ===== TARGET PLAYER TAB =====
+local TargetTab = Window:CreateTab("🎯 ปรับคนอื่น")
+local Section2 = TargetTab:CreateSection("เลือกเป้าหมาย")
+
+-- Player Dropdown (เลือกผู้เล่น)
+local playerNames = {}
+for _, player in ipairs(game.Players:GetPlayers()) do
+    table.insert(playerNames, player.Name)
+end
+
+Section2:CreateDropdown("เลือกผู้เล่น", playerNames, function(selected)
+    getgenv().CoolguiConfig.TargetPlayer = game.Players:FindFirstChild(selected)
+end)
+
+-- Target Speed Slider
+Section2:CreateSlider("ความเร็วเป้าหมาย", 0, 500, 16, function(value)
+    local target = getgenv().CoolguiConfig.TargetPlayer
+    if target and target.Character then
+        target.Character.Humanoid.WalkSpeed = value
+    end
+end)
+
+-- Target Jump Power
+Section2:CreateSlider("พลังกระโดดเป้าหมาย", 0, 1000, 50, function(value)
+    local target = getgenv().CoolguiConfig.TargetPlayer
+    if target and target.Character then
+        target.Character.Humanoid.JumpPower = value
+    end
+end)
+
+-- Target Size
+Section2:CreateSlider("ขนาดตัวเป้าหมาย", 0.1, 10, 1, function(value)
+    local target = getgenv().CoolguiConfig.TargetPlayer
+    if target and target.Character then
+        target.Character.HumanoidRootPart.Size = Vector3.new(value, value, value)
+    end
+end)
+
+-- Target Transparency
+Section2:CreateSlider("ความโปร่งใสเป้าหมาย", 0, 1, 0, function(value)
+    local target = getgenv().CoolguiConfig.TargetPlayer
+    if target and target.Character then
+        for _, part in ipairs(target.Character:GetDescendants()) do
+            if part:IsA("BasePart") then
+                part.Transparency = value
+            end
+        end
+    end
+end)
+
+-- ===== CHAOS TAB =====
+local ChaosTab = Window:CreateTab("💥 ป่วนเกม")
+local Section3 = ChaosTab:CreateSection("โหมดจลาจล")
+
+-- Chaos Intensity Slider
+Section3:CreateSlider("ความแรงป่วน", 1, 100, 50, function(value)
+    getgenv().ChaosIntensity = value
+end)
+
+-- Auto Kill Toggle
+Section3:CreateToggle("ฆ่าทุกคนอัตโนมัติ", function(v)
+    getgenv().AutoKill = v
+    while getgenv().AutoKill do
+        for _, player in ipairs(game.Players:GetPlayers()) do
+            if player ~= game.Players.LocalPlayer then
+                local char = player.Character
+                if char then
+                    char.Humanoid.Health = 0
+                end
+            end
+        end
+        wait(0.5)
+    end
+end)
+
+-- Random Teleport
+Section3:CreateButton("สุ่มเทเลพอร์ตทุกคน", function()
+    for _, player in ipairs(game.Players:GetPlayers()) do
+        if player ~= game.Players.LocalPlayer then
+            local char = player.Character
+            if char then
+                char.HumanoidRootPart.CFrame = CFrame.new(
+                    math.random(-500, 500),
+                    math.random(10, 500),
+                    math.random(-500, 500)
+                )
+            end
+        end
+    end
+end)
+
+-- ===== VISUAL TAB =====
+local VisualTab = Window:CreateTab("🎨 ธีมดำแดง")
+local Section4 = VisualTab:CreateSection("ปรับธีม")
+
+-- Background Color
+Section4:CreateColorpicker("สีพื้นหลัง", Color3.fromRGB(0, 0, 0), function(color)
+    game.Lighting.BackgroundColor = color
+end)
+
+-- Ambient Color
+Section4:CreateColorpicker("สีแสง", Color3.fromRGB(255, 0, 0), function(color)
+    game.Lighting.Ambient = color
+end)
+
+-- Rainbow Toggle
+Section4:CreateToggle("สีรุ้ง", function(v)
+    getgenv().Rainbow = v
+    while getgenv().Rainbow do
+        game.Lighting.Ambient = Color3.fromHSV(tick() % 1, 1, 1)
+        wait(0.1)
+    end
+end)
+
+-- ===== TROLL TAB =====
+local TrollTab = Window:CreateTab("🤡 แกล้งคน")
+local Section5 = TrollTab:CreateSection("คำสั่งป่วน")
+
+-- Freeze All
+Section5:CreateButton("แช่แข็งทุกคน", function()
+    for _, player in ipairs(game.Players:GetPlayers()) do
+        if player ~= game.Players.LocalPlayer then
+            local char = player.Character
+            if char then
+                char.Humanoid.WalkSpeed = 0
+                char.Humanoid.JumpPower = 0
+            end
+        end
+    end
+end)
+
+-- Spin All
+Section5:CreateButton("ทำให้ทุกคนหมุน", function()
+    for _, player in ipairs(game.Players:GetPlayers()) do
+        if player ~= game.Players.LocalPlayer then
+            local char = player.Character
+            if char then
+                char.HumanoidRootPart.RotVelocity = Vector3.new(0, 100, 0)
+            end
+        end
+    end
+end)
+
+-- ===== GUI SETTINGS =====
+local GuiTab = Window:CreateTab("🖥️ ตั้งค่า GUI")
+local Section6 = GuiTab:CreateSection("ปรับแต่งหน้าต่าง")
+
+-- GUI Scale
+Section6:CreateSlider("ขนาด GUI", 0.5, 2, 1, function(value)
+    Window:SetScale(value)
+end)
+
+-- GUI Transparency
+Section6:CreateSlider("ความโปร่งใส GUI", 0, 1, 0, function(value)
+    Window:SetTransparency(value)
+end)
+
+-- GUI Position (ลากได้)
+Section6:CreateButton("รีเซ็ตตำแหน่ง GUI", function()
+    Window:ResetPosition()
+end)
+
+-- ===== CREDITS =====
+local CreditTab = Window:CreateTab("ℹ️ เกี่ยวกับ")
+local Section7 = CreditTab:CreateSection("เครดิต")
+
+Section7:CreateLabel("Coolgui Hub v3.0")
+Section7:CreateLabel("Full Customizable Edition")
+Section7:CreateLabel("ธีมดำแดงสุดเท่ 🔴⚫")
+Section7:CreateLabel("สำหรับ Delta Executor")
+
+-- ===== FLIGHT CONTROLLER =====
+spawn(function()
+    while wait() do
+        local char = game.Players.LocalPlayer.Character
+        if char and getgenv().CoolguiConfig.FlightSpeed > 0 then
+            local humanoid = char:FindFirstChildOfClass("Humanoid")
+            if humanoid and humanoid:GetState() == Enum.HumanoidStateType.Flying then
+                local moveDirection = humanoid.MoveDirection
+                if moveDirection.Magnitude > 0 then
+                    char.HumanoidRootPart.Velocity = moveDirection * getgenv().CoolguiConfig.FlightSpeed
+                end
+            end
+        end
+    end
+end)
+
+print("✅ Coolgui Hub v3.0 โหลดสำเร็จ!")
+print("🎮 ปรับได้ทุกอย่างตามใจชอบ!")
